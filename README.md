@@ -1,48 +1,22 @@
-# Electron with Typescript application example
+웹프로그래밍 스타일인 만큼 mvc를 그대로 채용하기
 
-This example show how you can use Next.js inside an Electron application to avoid a lot of configuration, use Next.js router as view and use server-render to speed up the initial render of the application. Both Next.js and Electron layers are written in TypeScript and compiled to JavaScript during the build process.
+모델: 항목이나 태그 등의 객체에 대한 정보, 로직을 저장
+뷰: ui, 모델로부터 정보를 받아와서 보여줌
+컨트롤러: 뷰와 모델 사이의 연결, 결합도를 낮추는 역할
+유저정보저장: 모델에서 정의되어 있는 객체의 인스턴스를 저장
+//이전프로젝트에서는 컨트롤러의 부재로 혼선가 생겼던것 같음
+//이번 기회에 여러가지 기술에 도전해보기, 패키징이나(electron forge) 프론트엔드 라이브러리(react?) 등
 
-| Part       | Source code (Typescript) | Builds (JavaScript) |
-| ---------- | ------------------------ | ------------------- |
-| Next.js    | `/renderer`              | `/renderer`         |
-| Electron   | `/electron-src`          | `/main`             |
-| Production |                          | `/dist`             |
+모델상세: 항목에 대한 crud, 태그에 대한 crud, 기능성 태그의 경우 해당 기믹 구현 로직,
+	항목의 상태변화와 알람 그리고 이를 위한 time관련 로직, 기타 저장등의 프로그램 로직을 담은 .js (main.js todo.js, tag.js, timer.js etc...)
 
-For development it's going to run a HTTP server and let Next.js handle routing. In production it use `output: 'export'` to pre-generate HTML static files and use them in your app instead of running an HTTP server.
+뷰상세: ui, 프로그램 인터페이스 전체, html, js파일과 css로 구성, react사용여부는 고민좀 (index.html, style.css, view.js)
 
-## How to use
+컨트롤러상세: 뷰를 통한 input을 모델에게 전달, 모델이 처리한 output을 뷰에게 전달하는 로직, js파일 (controller.js)
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+유저정보저장상세: json을 사용, 로드시 각각의 객체화 되어있는 todo들을 로딩
 
-```bash
-npx create-next-app --example with-electron-typescript with-electron-typescript-app
-```
+-----------------------------------------------------------------------------------------------------------------------------
+todo: title, text, state, tag, expire_date(기한이 없으면 null, 있으면 date) 를 가진 객체
 
-```bash
-yarn create next-app --example with-electron-typescript with-electron-typescript-app
-```
 
-```bash
-pnpm create next-app --example with-electron-typescript with-electron-typescript-app
-```
-
-Available commands:
-
-```bash
-"build-renderer": build and transpile Next.js layer
-"build-electron": transpile electron layer
-"build": build both layers
-"dev": start dev version
-"dist": create production electron build
-"type-check": check TypeScript in project
-```
-
-## Notes
-
-You can create the production app using `npm run dist`.
-
-_note regarding types:_
-
-- Electron provides its own type definitions, so you don't need @types/electron installed!
-  source: https://www.npmjs.com/package/@types/electron
-- There were no types available for `electron-next` at the time of creating this example, so until they are available there is a file `electron-next.d.ts` in `electron-src` directory.
