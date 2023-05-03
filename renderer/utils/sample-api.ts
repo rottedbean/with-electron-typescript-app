@@ -1,6 +1,3 @@
-import { Todo } from '../interfaces/Todo'
-import fs from 'fs';
-import path from 'path';
 import {User} from '../interfaces/index'
 
 /** Dummy user data. */
@@ -35,12 +32,3 @@ export async function findAll() {
 
   return dataArray
 }
-
-export function getConfig(): Todo[] {
-  const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Application Support' : '/var/local');
-  const configPath = path.join(appDataPath, 'config.json');
-
-  const configData = fs.readFileSync(configPath, 'utf-8');
-  return JSON.parse(configData);
-}
-

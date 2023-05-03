@@ -1,6 +1,15 @@
 import {remote} from 'electron'
-import {Todo} from '../interfaces/Todo'
+import {Todo} from '../renderer/interfaces/Todo'
 import fs from "fs/promises";
+import fsnp from "fs"
+
+export function getConfig(): Todo[] {
+  const appDataPath = remote.app.getPath('appData');
+  const filePath = `${appDataPath}/myAppFormData.json`;
+
+  const configData = fsnp.readFileSync(filePath, 'utf-8');
+  return JSON.parse(configData);
+}
 
 //ui창에서 입력한 데이터 객체형태로 전달
 export async function creatingTodoProcess(formData:Todo) {    

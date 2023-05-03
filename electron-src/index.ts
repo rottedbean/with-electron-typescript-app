@@ -1,11 +1,14 @@
 // Native
 import { join } from 'path'
 import { format } from 'url'
+import fs from 'fs'
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron'
+import { BrowserWindow, app, ipcMain, IpcMainEvent, remote } from 'electron'
 import isDev from 'electron-is-dev'
 import prepareNext from 'electron-next'
+
+import {creatingTodoProcess, deleteTodoProcess, getConfig} from './Controller'
 
 // Prepare the renderer once the app is ready
 app.on('ready', async () => {
@@ -39,4 +42,32 @@ app.on('window-all-closed', app.quit)
 ipcMain.on('message', (event: IpcMainEvent, message: any) => {
   console.log(message)
   setTimeout(() => event.sender.send('message', 'hi from electron'), 500)
+})
+
+ipcMain.on('formUp', (_event: IpcMainEvent, formdata: any) => {
+  creatingTodoProcess(formdata);
+})
+
+ipcMain.on('formDelete', (_event: IpcMainEvent, id: string) => {
+  deleteTodoProcess(id);
+})
+
+ipcMain.on('makeWatch', (event: IpcMainEvent) => {
+  const appDataPath = remote.app.getPath('appData');
+    const filePath = `${appDataPath}/myAppFormData.json`;
+
+    const watcher = fs.watch(filePath, (eventType) => {
+      if (eventType === 'change') {
+        event.reply('changedText', getConfig())
+      }
+    });
+
+    return () => {
+      watcher.close();
+    };
+})
+
+ipcMain.handle('getMyData',() => {
+  const data = getConfig()
+  return data
 })

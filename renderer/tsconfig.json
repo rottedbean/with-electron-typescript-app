@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "../electron-src/Controller.ts"  ],
   "exclude": [
     "node_modules"
   ]
