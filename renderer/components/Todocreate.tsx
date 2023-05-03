@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { creatingTodoProcess } from '../utils/Controller';
+import { useState, } from 'react';
 import { Todo, Tag, State } from '../interfaces/Todo'
 import { v4 as uuid } from 'uuid';
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
+type Props = {
+  children: any
+}
 
-export default function TodoForm() {
+function TodoForm(children:Props) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [state, setState] = useState<State>('default');
@@ -24,7 +26,7 @@ export default function TodoForm() {
       expire_date: expireDate,
       tag: tags
     };
-    creatingTodoProcess(newTodo);
+    global.ipcRenderer.send('formUp', newTodo)
     setTitle('');
     setText('');
     setState('default');
@@ -49,8 +51,10 @@ export default function TodoForm() {
   };
 
   const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTag = { name: event.target.value };
-    setTags((prevState) => [...prevState, newTag]);
+    const newTag:Tag = { name: event.target.value.trim() };
+    if (newTag.name !== '') {
+      setTags((prevState) => [...prevState, newTag]);
+    }
   };
 
   return (
@@ -95,3 +99,5 @@ export default function TodoForm() {
     </form>
   );
 }
+
+export default TodoForm
