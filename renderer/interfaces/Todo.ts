@@ -1,7 +1,3 @@
-export interface Tag {
-    name: string
-}
-
 const state = {
     Default: 'default',
     Done: 'done',
@@ -18,7 +14,7 @@ export interface Todo {
     text:string
     state: State
     expire_date: null|Date
-    tag?: Tag[] 
+    tag?: string[] 
 
 }
 
