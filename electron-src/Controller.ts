@@ -1,65 +1,61 @@
-import {remote} from 'electron'
 import {Todo} from '../renderer/interfaces/Todo'
 import fs from "fs/promises";
-import fsnp from "fs"
+import path from "path"
 
-export function getConfig(): Todo[] {
-  const appDataPath = remote.app.getPath('appData');
-  const filePath = `${appDataPath}/myAppFormData.json`;
+export async function getTodo(): Promise<Todo[]> {
+  const filePath = path.join(process.cwd(), 'public', 'FormData.json');
 
-  const configData = fsnp.readFileSync(filePath, 'utf-8');
+  checkFileExists(filePath)
+  const configData = await fs.readFile(filePath, 'utf-8');
   return JSON.parse(configData);
 }
 
 //ui창에서 입력한 데이터 객체형태로 전달
-export async function creatingTodoProcess(formData:Todo) {    
-    
-  // Electron의 `app` 모듈을 사용하여 애플리케이션 데이터 디렉토리를 가져옵니다.
-  const appDataPath = remote.app.getPath('appData');
-
-  // 애플리케이션 데이터 디렉토리에 데이터를 저장합니다.
-  const filePath = `${appDataPath}/myAppFormData.json`;
-
-  if (await checkFileExists(filePath)) {
-  // 파일이 존재하는 경우
-  fs.appendFile(filePath, JSON.stringify(formData));
-} else {
-  // 파일이 존재하지 않는 경우
-  fs.writeFile(filePath, JSON.stringify(formData));
-}
+export async function addTodoProcess(formData:Todo) {
   
+  const filePath = path.join(process.cwd(), 'public', 'FormData.json');
+
+  await checkFileExists(filePath) 
+
+  // 파일이 존재하는 경우
+  const todosRaw = await fs.readFile(filePath,'utf-8');
+  const todos = JSON.parse(todosRaw) as Todo[];
+  todos.push(formData);
+  const updatedTodos = JSON.stringify(todos);
+  await fs.writeFile(filePath, updatedTodos);
+   
 }
 
 //id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신
 export async function updateTodoProcess(id: string, formData: Todo) {
     
-    const appDataPath = remote.app.getPath('appData');
-    const filePath = `${appDataPath}/myAppFormData.json`;
+  const filePath = path.join(process.cwd(), 'public', 'FormData.json');
     
-    if (await checkFileExists(filePath)){
+    await checkFileExists(filePath)
 
-      // 파일을 불러옵니다.
-      const rawData = await fs.readFile(filePath, "utf-8");
-      const data: Todo[] = JSON.parse(rawData);
-      const targetTodo = data.find(todo => todo.id === id);
+    // 파일을 불러옵니다.
+    const rawData = await fs.readFile(filePath, "utf-8");
+    const data: Todo[] = JSON.parse(rawData);
+    const targetTodo = data.find(todo => todo.id === id);
 
-      if (targetTodo) {
-      // 해당 todo 객체가 존재하면 업데이트합니다.
-      const updatedTodo = { ...targetTodo, ...formData };
-      const updatedTodos = data.map(todo => {
-        if (todo.id === id) {
-          return updatedTodo;
-        } else {
-          return todo;
-        }
-      });
+    if (targetTodo) {
+    // 해당 todo 객체가 존재하면 업데이트합니다.
+    const updatedTodo = { ...targetTodo, ...formData };
+    const updatedTodos = data.map(todo => {
+      if (todo.id === id) {
+        return updatedTodo;
+      } else {
+        return todo;
+      }
+    });
 
-      // 파일에 데이터를 다시 씁니다.
-      fs.writeFile(filePath, JSON.stringify(updatedTodos));
+    // 파일에 데이터를 다시 씁니다.
+    fs.writeFile(filePath, JSON.stringify(updatedTodos));
+
     } else {
       console.log(`해당 id(${id})를 가진 todo가 존재하지 않습니다.`);
     }
-    }
+    
     
   }
 
@@ -67,10 +63,9 @@ export async function updateTodoProcess(id: string, formData: Todo) {
 export async function deleteTodoProcess(id: string) {
   try {
 
-    const appDataPath = remote.app.getPath('appData');
-    const filePath = `${appDataPath}/myAppFormData.json`;
+    const filePath = path.join(process.cwd(), 'public', 'FormData.json');
     
-    if (await checkFileExists(filePath)){
+    await checkFileExists(filePath)
 
       // 파일을 불러옵니다.
     const rawData = await fs.readFile(filePath, "utf-8");
@@ -83,18 +78,20 @@ export async function deleteTodoProcess(id: string) {
     await fs.writeFile(filePath, JSON.stringify(filteredData, null, 2));
 
     console.log(`Todo with id ${id} has been deleted.`);
-    }    
+        
   } catch (error) {
     console.error(`Error deleting todo with id ${id}:`, error);
   }
 }
 
+//파일 존재 여부 확인, 없으면 공백문서 생성
 async function checkFileExists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
     return true;
   } catch (err:any) {
     if (err.code === 'ENOENT') {
+      fs.writeFile(filePath,JSON.stringify([]))
       return false;
     } else {
       throw err;

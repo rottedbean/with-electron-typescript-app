@@ -1,6 +1,7 @@
-import { useState, } from 'react';
-import { Todo, Tag, State } from '../interfaces/Todo'
+import { useState} from 'react';
+import { Todo, State } from '../interfaces/Todo'
 import { v4 as uuid } from 'uuid';
+import useSWR , { useSWRConfig } from 'swr'
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -14,7 +15,10 @@ function TodoForm(children:Props) {
   const [text, setText] = useState('');
   const [state, setState] = useState<State>('default');
   const [expireDate, setExpireDate] = useState<Date|null>(null);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagValue, setTagvalue] = useState('');
+
+  const { mutate } = useSWRConfig()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,6 +36,7 @@ function TodoForm(children:Props) {
     setState('default');
     setExpireDate(null);
     setTags([]);
+    mutate('/api/formDataFetcher');
   };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,12 +56,24 @@ function TodoForm(children:Props) {
   };
 
   const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newTag:Tag = { name: event.target.value.trim() };
-    if (newTag.name !== '') {
-      setTags((prevState) => [...prevState, newTag]);
+    setTagvalue(event.target.value)
+  };
+
+  const handleTagAdd = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    //중복확인추가필요
+    if (tagValue != ''){
+      const newtag = tagValue.trim()
+      setTags([...tags, newtag]);
+      setTagvalue('');
     }
   };
 
+  const handleTagDelete = (tagToDelete:string) => {
+    setTags([...tags.filter(tags => tags !== tagToDelete)]);
+  }
+
+  //여기에 disable을 넣어서 가시성 여부 조정하는게 나을듯
   return (
     <form onSubmit={handleSubmit}>
       <label>
@@ -92,7 +109,14 @@ function TodoForm(children:Props) {
       <br />
       <label>
         Tag:
-        <input type="text" onChange={handleTagChange} />
+        <input type="text" value={tagValue} onChange={handleTagChange}/>
+        <button onClick={handleTagAdd}>add tag</button>
+        {tags.map((tag) => (
+          <>
+          <p>{tag}</p>
+          <button onClick={() => handleTagDelete(tag)}>x</button>
+          </>
+        ))}
       </label>
       <br />
       <button type="submit">Submit</button>

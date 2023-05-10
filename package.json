@@ -1,6 +1,6 @@
 {
   "private": true,
-  "main": "main/index.js",
+  "main": "main/electron-src/index.js",
   "productName": "ElectronTypescriptNext",
   "scripts": {
     "clean": "rimraf dist main renderer/out renderer/.next",
@@ -13,11 +13,13 @@
     "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
   },
   "dependencies": {
+    "@types/electron": "^1.6.10",
     "electron-is-dev": "^1.1.0",
     "electron-next": "^3.1.5",
     "react": "^18.2.0",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
+    "swr": "^2.1.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
