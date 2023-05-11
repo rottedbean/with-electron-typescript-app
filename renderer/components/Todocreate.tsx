@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { v4 as uuid } from 'uuid';
-import useSWR, { useSWRConfig } from 'swr';
+import { useSWRConfig } from 'swr';
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
 type Props = {
-  children: any;
+  children: React.ReactNode;
+  setisAdding: (value: boolean) => void;
 };
 
-function TodoForm(children: Props) {
+function TodoForm({ children, setisAdding }: Props) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [state, setState] = useState<State>('default');
@@ -30,13 +31,14 @@ function TodoForm(children: Props) {
       expire_date: expireDate,
       tag: tags,
     };
-    global.ipcRenderer.send('formUp', newTodo);
+    global.ipcRenderer.send('formCreate', newTodo);
     setTitle('');
     setText('');
     setState('default');
     setExpireDate(null);
     setTags([]);
     mutate('/api/formDataFetcher');
+    setisAdding(false);
   };
 
   const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
