@@ -1,47 +1,44 @@
-import {Todo} from '../renderer/interfaces/Todo'
-import fs from "fs/promises";
-import path from "path"
+import { Todo } from '../renderer/interfaces/Todo';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function getTodo(): Promise<Todo[]> {
   const filePath = path.join(process.cwd(), 'public', 'FormData.json');
 
-  checkFileExists(filePath)
+  checkFileExists(filePath);
   const configData = await fs.readFile(filePath, 'utf-8');
   return JSON.parse(configData);
 }
 
 //ui창에서 입력한 데이터 객체형태로 전달
-export async function addTodoProcess(formData:Todo) {
-  
+export async function addTodoProcess(formData: Todo) {
   const filePath = path.join(process.cwd(), 'public', 'FormData.json');
 
-  await checkFileExists(filePath) 
+  await checkFileExists(filePath);
 
   // 파일이 존재하는 경우
-  const todosRaw = await fs.readFile(filePath,'utf-8');
+  const todosRaw = await fs.readFile(filePath, 'utf-8');
   const todos = JSON.parse(todosRaw) as Todo[];
   todos.push(formData);
   const updatedTodos = JSON.stringify(todos);
   await fs.writeFile(filePath, updatedTodos);
-   
 }
 
 //id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신
 export async function updateTodoProcess(id: string, formData: Todo) {
-    
   const filePath = path.join(process.cwd(), 'public', 'FormData.json');
-    
-    await checkFileExists(filePath)
 
-    // 파일을 불러옵니다.
-    const rawData = await fs.readFile(filePath, "utf-8");
-    const data: Todo[] = JSON.parse(rawData);
-    const targetTodo = data.find(todo => todo.id === id);
+  await checkFileExists(filePath);
 
-    if (targetTodo) {
+  // 파일을 불러옵니다.
+  const rawData = await fs.readFile(filePath, 'utf-8');
+  const data: Todo[] = JSON.parse(rawData);
+  const targetTodo = data.find((todo) => todo.id === id);
+
+  if (targetTodo) {
     // 해당 todo 객체가 존재하면 업데이트합니다.
     const updatedTodo = { ...targetTodo, ...formData };
-    const updatedTodos = data.map(todo => {
+    const updatedTodos = data.map((todo) => {
       if (todo.id === id) {
         return updatedTodo;
       } else {
@@ -51,24 +48,19 @@ export async function updateTodoProcess(id: string, formData: Todo) {
 
     // 파일에 데이터를 다시 씁니다.
     fs.writeFile(filePath, JSON.stringify(updatedTodos));
-
-    } else {
-      console.log(`해당 id(${id})를 가진 todo가 존재하지 않습니다.`);
-    }
-    
-    
+  } else {
+    console.log(`해당 id(${id})를 가진 todo가 존재하지 않습니다.`);
   }
-
+}
 
 export async function deleteTodoProcess(id: string) {
   try {
-
     const filePath = path.join(process.cwd(), 'public', 'FormData.json');
-    
-    await checkFileExists(filePath)
 
-      // 파일을 불러옵니다.
-    const rawData = await fs.readFile(filePath, "utf-8");
+    await checkFileExists(filePath);
+
+    // 파일을 불러옵니다.
+    const rawData = await fs.readFile(filePath, 'utf-8');
     const data: Todo[] = JSON.parse(rawData);
 
     // id 값이 일치하지 않는 객체들로 이루어진 새로운 배열을 생성합니다.
@@ -78,7 +70,6 @@ export async function deleteTodoProcess(id: string) {
     await fs.writeFile(filePath, JSON.stringify(filteredData, null, 2));
 
     console.log(`Todo with id ${id} has been deleted.`);
-        
   } catch (error) {
     console.error(`Error deleting todo with id ${id}:`, error);
   }
@@ -89,9 +80,9 @@ async function checkFileExists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
     return true;
-  } catch (err:any) {
+  } catch (err: any) {
     if (err.code === 'ENOENT') {
-      fs.writeFile(filePath,JSON.stringify([]))
+      fs.writeFile(filePath, JSON.stringify([]));
       return false;
     } else {
       throw err;
