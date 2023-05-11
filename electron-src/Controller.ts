@@ -2,13 +2,7 @@ import { Todo } from '../renderer/interfaces/Todo';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function getTodo(): Promise<Todo[]> {
-  const filePath = path.join(process.cwd(), 'public', 'FormData.json');
-
-  checkFileExists(filePath);
-  const configData = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(configData);
-}
+//각 함수에서 반복되는 부분 제거해야할듯
 
 //ui창에서 입력한 데이터 객체형태로 전달
 export async function addTodoProcess(formData: Todo) {
@@ -22,6 +16,7 @@ export async function addTodoProcess(formData: Todo) {
   todos.push(formData);
   const updatedTodos = JSON.stringify(todos);
   await fs.writeFile(filePath, updatedTodos);
+  console.log(`Todo with id ${formData.id} has been created.`);
 }
 
 //id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신
@@ -48,6 +43,7 @@ export async function updateTodoProcess(id: string, formData: Todo) {
 
     // 파일에 데이터를 다시 씁니다.
     fs.writeFile(filePath, JSON.stringify(updatedTodos));
+    console.log(`Todo with id ${id} has been updated.`);
   } else {
     console.log(`해당 id(${id})를 가진 todo가 존재하지 않습니다.`);
   }

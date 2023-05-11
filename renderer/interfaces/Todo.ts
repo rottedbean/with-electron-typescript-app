@@ -14,5 +14,5 @@ export interface Todo {
   text: string;
   state: State;
   expire_date: null | Date;
-  tag?: string[];
+  tag: string[];
 }
