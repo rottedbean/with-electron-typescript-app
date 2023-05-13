@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
+import { Button } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 import { Todo } from '../interfaces/Todo';
 import TodoForm from '../components/TodoCreate';
@@ -76,9 +78,9 @@ export default function TodoPage() {
             <button onClick={() => setisAdding(false)}>close</button>
           </>
         ) : null}
-        <button onClick={() => setisAdding(true)} disabled={isAdding}>
-          Add Todo
-        </button>
+        <Button onClick={() => setisAdding(true)} disabled={isAdding}>
+          <AddIcon></AddIcon>
+        </Button>
       </div>
     </Layout>
   );
