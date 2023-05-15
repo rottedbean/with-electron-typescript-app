@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { v4 as uuid } from 'uuid';
 import { useSWRConfig } from 'swr';
+//mui datepicker로 바꿀듯
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,6 +12,7 @@ type Props = {
   setisAdding: (value: boolean) => void;
 };
 
+//todocreate와 todoupdate는 중복이 많음, 리팩토링 필요
 function TodoForm({ children, setisAdding }: Props) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
@@ -71,11 +73,14 @@ function TodoForm({ children, setisAdding }: Props) {
     }
   };
 
-  const handleTagDelete = (tagToDelete: string) => {
+  const handleTagDelete = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    tagToDelete: string,
+  ) => {
+    event.preventDefault();
     setTags([...tags.filter((tags) => tags !== tagToDelete)]);
   };
 
-  //여기에 disable을 넣어서 가시성 여부 조정하는게 나을듯
   return (
     <form onSubmit={handleSubmit}>
       <label>
@@ -118,11 +123,11 @@ function TodoForm({ children, setisAdding }: Props) {
         Tag:
         <input type='text' value={tagValue} onChange={handleTagChange} />
         <button onClick={handleTagAdd}>add tag</button>
-        {tags.map((tag) => (
-          <>
+        {tags.map((tag, index) => (
+          <div key={`tag-${index}`}>
             <p>{tag}</p>
-            <button onClick={() => handleTagDelete(tag)}>x</button>
-          </>
+            <button onClick={(e) => handleTagDelete(e, tag)}>x</button>
+          </div>
         ))}
       </label>
       <br />

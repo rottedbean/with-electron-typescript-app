@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { useSWRConfig } from 'swr';
+//mui datepicker로 바꿀듯
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -75,11 +76,14 @@ function TodoUpdateForm({
     }
   };
 
-  const handleTagDelete = (tagToDelete: string) => {
+  const handleTagDelete = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    tagToDelete: string,
+  ) => {
+    event.preventDefault();
     setTags([...tags.filter((tags) => tags !== tagToDelete)]);
   };
 
-  //여기에 disable을 넣어서 가시성 여부 조정하는게 나을듯
   return (
     <form onSubmit={handleSubmit}>
       <label>
@@ -122,11 +126,11 @@ function TodoUpdateForm({
         Tag:
         <input type='text' value={tagValue} onChange={handleTagChange} />
         <button onClick={handleTagAdd}>add tag</button>
-        {tags.map((tag) => (
-          <>
+        {tags.map((tag, index) => (
+          <div key={`tag-${index}`}>
             <p>{tag}</p>
-            <button onClick={() => handleTagDelete(tag)}>x</button>
-          </>
+            <button onClick={(e) => handleTagDelete(e, tag)}>x</button>
+          </div>
         ))}
       </label>
       <br />
