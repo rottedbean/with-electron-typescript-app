@@ -13,6 +13,6 @@ export interface Todo {
   title: string;
   text: string;
   state: State;
-  expire_date: null | Date;
+  expire_date: string;
   tag: string[];
 }
