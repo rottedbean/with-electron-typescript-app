@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,19 +9,41 @@ import TodoUpdateForm from '../components/TodoUpdate';
 import Layout from '../components/Layout';
 
 export default function TodoPage() {
+  const { data, error } = useSWR(
+    '/api/formDataFetcher',
+    async (url) => {
+      const res = await fetch(url);
+      return res.json();
+    },
+    {
+      fallbackData: [],
+    },
+  );
+
   const [isAdding, setisAdding] = useState(false);
   const [isUpdating, setisUpdating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
+  const [sortedList, setSortedList] = useState(data);
+  const [sortKey, setSortKey] = useState('none');
+
+  useEffect(() => {
+    if (data) {
+      setSortedList(data);
+    }
+  }, [data]);
+
   const { mutate } = useSWRConfig();
 
-  const { data, error } = useSWR('/api/formDataFetcher', async (url) => {
-    const res = await fetch(url);
-    return res.json();
-  });
-
-  if (error) return <div>Failed to load data</div>;
-  if (!data) return <div>Loading...</div>;
+  const handleSort = (key: string) => {
+    const sorted = [...sortedList].sort((a, b) => {
+      if (a[key] < b[key]) return -1;
+      if (a[key] > b[key]) return 1;
+      return 0;
+    });
+    setSortedList(sorted);
+    setSortKey(key);
+  };
 
   const handleDelete = (id: string) => {
     global.ipcRenderer.send('formDelete', id);
@@ -33,12 +55,22 @@ export default function TodoPage() {
     setisUpdating(true);
   };
 
+  if (error) return <div>Failed to load data</div>;
+  if (!data) return <div>Loading...</div>;
+
   return (
     <Layout title='List Example (as Function Component) | Next.js + TypeScript + Electron Example'>
       <div>
+        <div>
+          <button onClick={() => handleSort('title')}>Sort by Title</button>
+          <button onClick={() => handleSort('state')}>Sort by State</button>
+          <button onClick={() => handleSort('expire_date')}>
+            Sort by Date
+          </button>
+        </div>
         <ul>
-          {data.length === 0 && <p>woah</p>}
-          {data.map((todo: Todo) => (
+          {sortedList.length === 0 && <p>woah</p>}
+          {sortedList.map((todo: Todo) => (
             <li key={todo.id}>
               {isUpdating &&
               selectedTodo != null &&
@@ -50,14 +82,24 @@ export default function TodoPage() {
                     setisUpdating={setisUpdating}
                     setSelectedTodo={setSelectedTodo}
                     children={undefined}
-                  ></TodoUpdateForm>
+                  ></TodoUpdateForm>{' '}
+                  <button
+                    onClick={() => {
+                      setisUpdating(false);
+                      setSelectedTodo(null);
+                    }}
+                  >
+                    close
+                  </button>
                 </>
               ) : selectedTodo != null && selectedTodo.id == todo.id ? (
                 //상세보기의 경우
                 <>
-                  <button onClick={() => setSelectedTodo(null)}>close</button>
+                  <p>detail page</p>
+                  <p>{todo.expire_date}</p>
                   <button onClick={() => handleDelete(todo.id)}>delete</button>
                   <button onClick={() => handleUpdate(todo)}>update</button>
+                  <button onClick={() => setSelectedTodo(null)}>close</button>
                 </>
               ) : (
                 //기본 경우
@@ -81,6 +123,7 @@ export default function TodoPage() {
         <Button onClick={() => setisAdding(true)} disabled={isAdding}>
           <AddIcon></AddIcon>
         </Button>
+        <p>now sorted by {sortKey}</p>
       </div>
     </Layout>
   );
