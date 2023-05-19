@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { useSWRConfig } from 'swr';
-//mui datepicker로 바꿀듯
-import DatePicker from 'react-datepicker';
 
-import 'react-datepicker/dist/react-datepicker.css';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
   children: React.ReactNode;
@@ -22,9 +23,7 @@ function TodoUpdateForm({
   const [title, setTitle] = useState(todoData.title);
   const [text, setText] = useState(todoData.text);
   const [state, setState] = useState<State>(todoData.state);
-  const [expireDate, setExpireDate] = useState<Date | null>(
-    todoData.expire_date,
-  );
+  const [expireDate, setExpireDate] = useState(todoData.expire_date);
   const [tags, setTags] = useState<string[]>(todoData.tag);
   const [tagValue, setTagvalue] = useState('');
 
@@ -59,7 +58,8 @@ function TodoUpdateForm({
   };
 
   const handleExpireDateChange = (date: Date | null) => {
-    setExpireDate(date);
+    const formattedDate = dayjs(date).format('YYYY/MM/DD');
+    setExpireDate(formattedDate);
   };
 
   const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,11 +115,12 @@ function TodoUpdateForm({
       <label>
         Expire Date:
         <br />
-        <DatePicker
-          selected={expireDate}
-          onChange={handleExpireDateChange}
-          disabled={state !== 'expire'}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            onChange={handleExpireDateChange}
+            disabled={state !== 'expire'}
+          />
+        </LocalizationProvider>
       </label>
       <br />
       <label>

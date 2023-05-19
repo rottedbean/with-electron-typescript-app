@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { v4 as uuid } from 'uuid';
 import { useSWRConfig } from 'swr';
-//mui datepicker로 바꿀듯
-import DatePicker from 'react-datepicker';
 
-import 'react-datepicker/dist/react-datepicker.css';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ function TodoForm({ children, setisAdding }: Props) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [state, setState] = useState<State>('default');
-  const [expireDate, setExpireDate] = useState<Date | null>(null);
+  const [expireDate, setExpireDate] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagValue, setTagvalue] = useState('');
 
@@ -37,7 +38,7 @@ function TodoForm({ children, setisAdding }: Props) {
     setTitle('');
     setText('');
     setState('default');
-    setExpireDate(null);
+    setExpireDate('');
     setTags([]);
     mutate('/api/formDataFetcher');
     setisAdding(false);
@@ -56,7 +57,8 @@ function TodoForm({ children, setisAdding }: Props) {
   };
 
   const handleExpireDateChange = (date: Date | null) => {
-    setExpireDate(date);
+    const formattedDate = dayjs(date).format('YYYY/MM/DD');
+    setExpireDate(formattedDate);
   };
 
   const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,11 +114,12 @@ function TodoForm({ children, setisAdding }: Props) {
       <label>
         Expire Date:
         <br />
-        <DatePicker
-          selected={expireDate}
-          onChange={handleExpireDateChange}
-          disabled={state !== 'expire'}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            onChange={handleExpireDateChange}
+            disabled={state !== 'expire'}
+          />
+        </LocalizationProvider>
       </label>
       <br />
       <label>
