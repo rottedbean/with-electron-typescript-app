@@ -1,3 +1,4 @@
+// /api 아래에 서버리스로 넣으면 굳이 함수들이 여기 있을 이유가 없는게?
 import { Todo } from '../renderer/interfaces/Todo';
 import fs from 'fs/promises';
 import path from 'path';
@@ -16,8 +17,7 @@ export async function addTodoProcess(formData: Todo) {
     console.error(`Error creating todo`, error);
   }
 }
-
-//id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신
+/** id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신*/
 export async function updateTodoProcess(id: string, formData: Todo) {
   const todos = await loadFile(filePath);
   const targetTodo = todos.find((todo) => todo.id === id);
