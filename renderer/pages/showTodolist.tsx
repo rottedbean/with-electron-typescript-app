@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { Button } from '@mui/material';
+import { Autocomplete, TextField, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import { Todo } from '../interfaces/Todo';
@@ -27,6 +27,8 @@ export default function TodoPage() {
   const [sortedList, setSortedList] = useState(data);
   const [sortKey, setSortKey] = useState('none');
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     if (data) {
       setSortedList(data);
@@ -45,7 +47,13 @@ export default function TodoPage() {
     setSortKey(key);
   };
 
+  //검색기능이란게 필요한가....
+  const handleSearch = (term: string) => {
+    console.log(term);
+  };
+
   const handleDelete = (id: string) => {
+    //dialog로 선택문 표시해야하는게?
     global.ipcRenderer.send('formDelete', id);
     mutate('/api/formDataFetcher');
   };
@@ -61,6 +69,31 @@ export default function TodoPage() {
   return (
     <Layout title='List Example (as Function Component) | Next.js + TypeScript + Electron Example'>
       <div>
+        <Autocomplete
+          freeSolo
+          disableClearable
+          options={data.map((todo: Todo) => todo.title)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label='Search input'
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+              }}
+              InputProps={{
+                ...params.InputProps,
+                type: 'search',
+              }}
+            />
+          )}
+        />
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={() => handleSearch(searchTerm)}
+        >
+          Search
+        </Button>
         <div>
           <button onClick={() => handleSort('title')}>Sort by Title</button>
           <button onClick={() => handleSort('state')}>Sort by State</button>
@@ -106,6 +139,11 @@ export default function TodoPage() {
                 <>
                   <h3>{todo.title}</h3>
                   <p>{todo.text}</p>
+                  {todo.tag.map((tag, index) => (
+                    <div key={`tag-${index}`}>
+                      <p>{tag}</p>
+                    </div>
+                  ))}
                   <button onClick={() => handleDelete(todo.id)}>delete</button>
                   <button onClick={() => handleUpdate(todo)}>update</button>
                   <button onClick={() => setSelectedTodo(todo)}>detail</button>
