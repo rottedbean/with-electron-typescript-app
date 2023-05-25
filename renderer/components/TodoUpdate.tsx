@@ -8,18 +8,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
-  children: React.ReactNode;
   todoData: Todo;
   setisUpdating: (value: boolean) => void;
   setSelectedTodo: (value: Todo | null) => void;
 };
 
-function TodoUpdateForm({
-  children,
-  todoData,
-  setisUpdating,
-  setSelectedTodo,
-}: Props) {
+function TodoUpdateForm({ todoData, setisUpdating, setSelectedTodo }: Props) {
   const [title, setTitle] = useState(todoData.title);
   const [text, setText] = useState(todoData.text);
   const [state, setState] = useState<State>(todoData.state);
@@ -45,25 +39,9 @@ function TodoUpdateForm({
     setSelectedTodo(null);
   };
 
-  const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value);
-  };
-
-  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value);
-  };
-
-  const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setState(event.target.value as State);
-  };
-
   const handleExpireDateChange = (date: Date | null) => {
     const formattedDate = dayjs(date).format('YYYY/MM/DD');
     setExpireDate(formattedDate);
-  };
-
-  const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTagvalue(event.target.value);
   };
 
   const handleTagAdd = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -91,19 +69,32 @@ function TodoUpdateForm({
         <input
           type='text'
           value={title}
-          onChange={handleTitleChange}
+          onChange={(event) => {
+            setTitle(event.target.value);
+          }}
           required
         />
       </label>
       <br />
       <label>
         Text:
-        <textarea value={text} onChange={handleTextChange} required />
+        <textarea
+          value={text}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          required
+        />
       </label>
       <br />
       <label>
         State:
-        <select value={state} onChange={handleStateChange}>
+        <select
+          value={state}
+          onChange={(event) => {
+            setState(event.target.value as State);
+          }}
+        >
           <option value='default'>Default</option>
           <option value='done'>Done</option>
           <option value='expire'>Expire</option>
@@ -125,12 +116,18 @@ function TodoUpdateForm({
       <br />
       <label>
         Tag:
-        <input type='text' value={tagValue} onChange={handleTagChange} />
+        <input
+          type='text'
+          value={tagValue}
+          onChange={(event) => {
+            setTagvalue(event.target.value);
+          }}
+        />
         <button onClick={handleTagAdd}>add tag</button>
         {tags.map((tag, index) => (
           <div key={`tag-${index}`}>
             <p>{tag}</p>
-            <button onClick={(e) => handleTagDelete(e, tag)}>x</button>
+            <button onClick={(event) => handleTagDelete(event, tag)}>x</button>
           </div>
         ))}
       </label>

@@ -6,9 +6,12 @@ import AddIcon from '@mui/icons-material/Add';
 import { Todo } from '../interfaces/Todo';
 import TodoForm from '../components/TodoCreate';
 import TodoUpdateForm from '../components/TodoUpdate';
+import ViewDefault from '../components/ViewDefault';
+import ViewDetail from '../components/ViewDetail';
 import Layout from '../components/Layout';
 
 export default function TodoPage() {
+  //서버로부터 데이터 패칭
   const { data, error } = useSWR(
     '/api/formDataFetcher',
     async (url) => {
@@ -20,23 +23,23 @@ export default function TodoPage() {
     },
   );
 
+  const { mutate } = useSWRConfig();
+
   const [isAdding, setisAdding] = useState(false);
   const [isUpdating, setisUpdating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
-
   const [sortedList, setSortedList] = useState(data);
   const [sortKey, setSortKey] = useState('none');
-
   const [searchTerm, setSearchTerm] = useState('');
 
+  //정렬리스트 초기값으로 원본 데이터 설정
   useEffect(() => {
     if (data) {
       setSortedList(data);
     }
   }, [data]);
 
-  const { mutate } = useSWRConfig();
-
+  //입력받는 키값을 기반으로 정렬, 문자열인 경우만 가능
   const handleSort = (key: string) => {
     const sorted = [...sortedList].sort((a, b) => {
       if (a[key] < b[key]) return -1;
@@ -67,7 +70,7 @@ export default function TodoPage() {
   if (!data) return <div>Loading...</div>;
 
   return (
-    <Layout title='List Example (as Function Component) | Next.js + TypeScript + Electron Example'>
+    <Layout title='Next.js + TypeScript + Electron Example'>
       <div>
         <Autocomplete
           freeSolo
@@ -102,7 +105,8 @@ export default function TodoPage() {
           </button>
         </div>
         <ul>
-          {sortedList.length === 0 && <p>woah</p>}
+          {sortedList.length === 0 && <p>there is no todo yet</p>}
+
           {sortedList.map((todo: Todo) => (
             <li key={todo.id}>
               {isUpdating &&
@@ -114,8 +118,7 @@ export default function TodoPage() {
                     todoData={todo}
                     setisUpdating={setisUpdating}
                     setSelectedTodo={setSelectedTodo}
-                    children={undefined}
-                  ></TodoUpdateForm>{' '}
+                  />{' '}
                   <button
                     onClick={() => {
                       setisUpdating(false);
@@ -128,8 +131,7 @@ export default function TodoPage() {
               ) : selectedTodo != null && selectedTodo.id == todo.id ? (
                 //상세보기의 경우
                 <>
-                  <p>detail page</p>
-                  <p>{todo.expire_date}</p>
+                  <ViewDetail todoData={todo} />
                   <button onClick={() => handleDelete(todo.id)}>delete</button>
                   <button onClick={() => handleUpdate(todo)}>update</button>
                   <button onClick={() => setSelectedTodo(null)}>close</button>
@@ -137,13 +139,7 @@ export default function TodoPage() {
               ) : (
                 //기본 경우
                 <>
-                  <h3>{todo.title}</h3>
-                  <p>{todo.text}</p>
-                  {todo.tag.map((tag, index) => (
-                    <div key={`tag-${index}`}>
-                      <p>{tag}</p>
-                    </div>
-                  ))}
+                  <ViewDefault todoData={todo} />
                   <button onClick={() => handleDelete(todo.id)}>delete</button>
                   <button onClick={() => handleUpdate(todo)}>update</button>
                   <button onClick={() => setSelectedTodo(todo)}>detail</button>
@@ -154,12 +150,12 @@ export default function TodoPage() {
         </ul>
         {isAdding ? (
           <>
-            <TodoForm setisAdding={setisAdding}> </TodoForm>{' '}
+            <TodoForm setisAdding={setisAdding} />{' '}
             <button onClick={() => setisAdding(false)}>close</button>
           </>
         ) : null}
         <Button onClick={() => setisAdding(true)} disabled={isAdding}>
-          <AddIcon></AddIcon>
+          <AddIcon />
         </Button>
         <p>now sorted by {sortKey}</p>
       </div>
