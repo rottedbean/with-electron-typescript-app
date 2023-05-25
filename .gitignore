@@ -37,3 +37,6 @@ next-env.d.ts
 # compiled js
 /main
 /renderer/.next
+
+# build file
+/dist
