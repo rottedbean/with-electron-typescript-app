@@ -3,7 +3,11 @@ import { Todo } from '../renderer/interfaces/Todo';
 import fs from 'fs/promises';
 import path from 'path';
 
-const filePath = path.join(process.cwd(), 'public', 'FormData.json');
+import isDev from 'electron-is-dev';
+
+const filePath = isDev
+  ? path.join(process.cwd(), 'public', 'FormData.json')
+  : path.join(__dirname, '../../public/FormData.json');
 
 //ui창에서 입력한 데이터 객체형태로 전달
 export async function addTodoProcess(formData: Todo) {
@@ -59,7 +63,7 @@ export async function deleteTodoProcess(id: string) {
 }
 
 // 파일을 불러옵니다.
-async function loadFile(filePath: string): Promise<Todo[]> {
+export async function loadFile(filePath: string): Promise<Todo[]> {
   await checkFileExists(filePath);
 
   const rawData = await fs.readFile(filePath, 'utf-8');
@@ -81,4 +85,3 @@ async function checkFileExists(filePath: string): Promise<boolean> {
     }
   }
 }
-//하하하

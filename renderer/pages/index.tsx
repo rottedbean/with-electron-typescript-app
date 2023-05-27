@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
 import { Autocomplete, TextField, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -10,20 +9,11 @@ import ViewDefault from '../components/ViewDefault';
 import ViewDetail from '../components/ViewDetail';
 import Layout from '../components/Layout';
 
+import { useDataFetcher } from '../utils/dataFetcher';
+
 export default function TodoPage() {
   //서버로부터 데이터 패칭
-  const { data, error } = useSWR(
-    '/api/formDataFetcher',
-    async (url) => {
-      const res = await fetch(url);
-      return res.json();
-    },
-    {
-      fallbackData: [],
-    },
-  );
-
-  const { mutate } = useSWRConfig();
+  const { data, mutate } = useDataFetcher('public/FormData.json');
 
   const [isAdding, setisAdding] = useState(false);
   const [isUpdating, setisUpdating] = useState(false);
@@ -46,8 +36,12 @@ export default function TodoPage() {
       if (a[key] > b[key]) return 1;
       return 0;
     });
-    setSortedList(sorted);
     setSortKey(key);
+    setSortedList(sorted);
+  };
+
+  const handleRefresh = async () => {
+    await mutate();
   };
 
   //검색기능이란게 필요한가....
@@ -55,10 +49,12 @@ export default function TodoPage() {
     console.log(term);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     //dialog로 선택문 표시해야하는게?
-    global.ipcRenderer.send('formDelete', id);
-    mutate('/api/formDataFetcher');
+    global.ipcRenderer.invoke('formDelete', id);
+    global.ipcRenderer.on('deleteComplete', () => {
+      handleRefresh();
+    });
   };
 
   const handleUpdate = (todo: Todo) => {
@@ -66,7 +62,6 @@ export default function TodoPage() {
     setisUpdating(true);
   };
 
-  if (error) return <div>Failed to load data</div>;
   if (!data) return <div>Loading...</div>;
 
   return (
@@ -118,6 +113,7 @@ export default function TodoPage() {
                     todoData={todo}
                     setisUpdating={setisUpdating}
                     setSelectedTodo={setSelectedTodo}
+                    handleRefresh={handleRefresh}
                   />{' '}
                   <button
                     onClick={() => {
@@ -150,7 +146,7 @@ export default function TodoPage() {
         </ul>
         {isAdding ? (
           <>
-            <TodoForm setisAdding={setisAdding} />{' '}
+            <TodoForm setisAdding={setisAdding} handleRefresh={handleRefresh} />{' '}
             <button onClick={() => setisAdding(false)}>close</button>
           </>
         ) : null}

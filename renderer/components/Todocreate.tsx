@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Todo, State } from '../interfaces/Todo';
 import { v4 as uuid } from 'uuid';
-import { useSWRConfig } from 'swr';
 
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -10,9 +9,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 type Props = {
   setisAdding: (value: boolean) => void;
+  handleRefresh: () => void;
 };
 
-function TodoForm({ setisAdding }: Props) {
+function TodoForm({ setisAdding, handleRefresh }: Props) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [state, setState] = useState<State>('default');
@@ -20,9 +20,7 @@ function TodoForm({ setisAdding }: Props) {
   const [tags, setTags] = useState<string[]>([]);
   const [tagValue, setTagvalue] = useState('');
 
-  const { mutate } = useSWRConfig();
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const newTodo: Todo = {
       id: uuid(),
@@ -32,14 +30,16 @@ function TodoForm({ setisAdding }: Props) {
       expire_date: expireDate,
       tag: tags,
     };
-    global.ipcRenderer.send('formCreate', newTodo);
     setTitle('');
     setText('');
     setState('default');
     setExpireDate('');
     setTags([]);
-    mutate('/api/formDataFetcher');
-    setisAdding(false);
+    global.ipcRenderer.invoke('formCreate', newTodo);
+    global.ipcRenderer.on('createComplete', () => {
+      handleRefresh();
+      setisAdding(false);
+    });
   };
 
   const handleExpireDateChange = (date: Date | null) => {

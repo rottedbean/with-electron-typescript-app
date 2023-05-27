@@ -1,9 +1,9 @@
 // Native
-import { join } from 'path';
+import path, { join } from 'path';
 import { format } from 'url';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
+import { BrowserWindow, app, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import prepareNext from 'electron-next';
 
@@ -11,6 +11,7 @@ import {
   addTodoProcess,
   deleteTodoProcess,
   updateTodoProcess,
+  loadFile,
 } from './Controller';
 import { Todo } from '../renderer/interfaces/Todo';
 
@@ -31,7 +32,7 @@ app.on('ready', async () => {
   const url = isDev
     ? 'http://localhost:8000/'
     : format({
-        pathname: join(__dirname, '../renderer/out/index.html'),
+        pathname: join(__dirname, '../../renderer/out/index.html'),
         protocol: 'file:',
         slashes: true,
       });
@@ -42,20 +43,27 @@ app.on('ready', async () => {
 // Quit the app once all windows are closed
 app.on('window-all-closed', app.quit);
 
-// listen the channel `message` and resend the received message to the renderer process
-ipcMain.on('message', (event: IpcMainEvent, message: any) => {
-  console.log(message);
-  setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
+ipcMain.handle('formCreate', async (event, formdata: Todo) => {
+  await addTodoProcess(formdata);
+  event.sender.send('createComplete');
 });
 
-ipcMain.on('formCreate', (_event: IpcMainEvent, formdata: Todo) => {
-  addTodoProcess(formdata);
+ipcMain.handle('formUpdate', async (event, formdata: Todo) => {
+  await updateTodoProcess(formdata.id, formdata);
+  event.sender.send('updateComplete');
 });
 
-ipcMain.on('formUpdate', (_event: IpcMainEvent, formdata: Todo) => {
-  updateTodoProcess(formdata.id, formdata);
+ipcMain.handle('formDelete', async (event, id: string) => {
+  await deleteTodoProcess(id);
+  event.sender.send('deleteComplete');
 });
 
-ipcMain.on('formDelete', (_event: IpcMainEvent, id: string) => {
-  deleteTodoProcess(id);
+ipcMain.handle('fetch', async (_event, url: string) => {
+  const data = await loadFile(url);
+  return data;
+});
+
+ipcMain.handle('getPath', async (_event) => {
+  const dataFilePath = path.join(__dirname, 'public', 'FormData.json');
+  return dataFilePath;
 });
