@@ -13,7 +13,7 @@ import { useDataFetcher } from '../utils/dataFetcher';
 
 export default function TodoPage() {
   //서버로부터 데이터 패칭
-  const { data, mutate } = useDataFetcher('public/FormData.json');
+  const { data, mutate } = useDataFetcher();
 
   const [isAdding, setisAdding] = useState(false);
   const [isUpdating, setisUpdating] = useState(false);

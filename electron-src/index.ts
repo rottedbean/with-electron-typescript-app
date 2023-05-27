@@ -58,8 +58,8 @@ ipcMain.handle('formDelete', async (event, id: string) => {
   event.sender.send('deleteComplete');
 });
 
-ipcMain.handle('fetch', async (_event, url: string) => {
-  const data = await loadFile(url);
+ipcMain.handle('fetch', async (_event) => {
+  const data = await loadFile();
   return data;
 });
 

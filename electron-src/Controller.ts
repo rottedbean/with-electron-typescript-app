@@ -3,15 +3,13 @@ import { Todo } from '../renderer/interfaces/Todo';
 import fs from 'fs/promises';
 import path from 'path';
 
-import isDev from 'electron-is-dev';
+import { app } from 'electron';
 
-const filePath = isDev
-  ? path.join(process.cwd(), 'public', 'FormData.json')
-  : path.join(__dirname, '../../public/FormData.json');
+const filePath = path.join(app.getPath('userData'), 'data.json');
 
 //ui창에서 입력한 데이터 객체형태로 전달
 export async function addTodoProcess(formData: Todo) {
-  const todos = await loadFile(filePath);
+  const todos = await loadFile();
   todos.push(formData);
   const updatedTodos = JSON.stringify(todos);
   try {
@@ -23,7 +21,7 @@ export async function addTodoProcess(formData: Todo) {
 }
 /** id를 기반으로 todo를 확인하고 전달받은 내용대로 갱신*/
 export async function updateTodoProcess(id: string, formData: Todo) {
-  const todos = await loadFile(filePath);
+  const todos = await loadFile();
   const targetTodo = todos.find((todo) => todo.id === id);
 
   if (targetTodo) {
@@ -49,7 +47,7 @@ export async function updateTodoProcess(id: string, formData: Todo) {
 }
 
 export async function deleteTodoProcess(id: string) {
-  const todos = await loadFile(filePath);
+  const todos = await loadFile();
 
   // id 값이 일치하지 않는 객체들로 이루어진 새로운 배열을 생성합니다.
   const filteredData = todos.filter((todo) => todo.id !== id);
@@ -63,8 +61,9 @@ export async function deleteTodoProcess(id: string) {
 }
 
 // 파일을 불러옵니다.
-export async function loadFile(filePath: string): Promise<Todo[]> {
+export async function loadFile(): Promise<Todo[]> {
   await checkFileExists(filePath);
+  console.log(filePath);
 
   const rawData = await fs.readFile(filePath, 'utf-8');
   const data: Todo[] = JSON.parse(rawData);

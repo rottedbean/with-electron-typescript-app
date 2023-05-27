@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export function useDataFetcher(url: string) {
+export function useDataFetcher() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -8,7 +8,7 @@ export function useDataFetcher(url: string) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const result = await global.ipcRenderer.invoke('fetch', url);
+      const result = await global.ipcRenderer.invoke('fetch');
       setData(result);
     } catch (error) {}
     setIsLoading(false);
@@ -16,7 +16,7 @@ export function useDataFetcher(url: string) {
 
   useEffect(() => {
     fetchData();
-  }, [url]);
+  }, []);
 
   return { data, isLoading, error, mutate: fetchData };
 }
