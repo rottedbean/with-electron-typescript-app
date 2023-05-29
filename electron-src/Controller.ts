@@ -63,8 +63,6 @@ export async function deleteTodoProcess(id: string) {
 // 파일을 불러옵니다.
 export async function loadFile(): Promise<Todo[]> {
   await checkFileExists(filePath);
-  console.log(filePath);
-
   const rawData = await fs.readFile(filePath, 'utf-8');
   const data: Todo[] = JSON.parse(rawData);
   return data;

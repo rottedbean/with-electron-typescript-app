@@ -66,77 +66,82 @@ function TodoForm({ setisAdding, handleRefresh }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Title:
-        <input
-          type='text'
-          value={title}
-          onChange={(event) => {
-            setTitle(event.target.value);
-          }}
-          required
-        />
-      </label>
-      <br />
-      <label>
-        Text:
-        <textarea
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
-          }}
-          required
-        />
-      </label>
-      <br />
-      <label>
-        State:
-        <select
-          value={state}
-          onChange={(event) => {
-            setState(event.target.value as State);
-          }}
-        >
-          <option value='default'>Default</option>
-          <option value='done'>Done</option>
-          <option value='expire'>Expire</option>
-          <option value='periodical'>Periodical</option>
-          <option value='pending'>Pending</option>
-        </select>
-      </label>
-      <br />
-      <label>
-        Expire Date:
-        <br />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            onChange={handleExpireDateChange}
-            disabled={state !== 'expire'}
+    <>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Title:
+          <input
+            type='text'
+            value={title}
+            onChange={(event) => {
+              setTitle(event.target.value);
+            }}
+            required
           />
-        </LocalizationProvider>
-      </label>
-      <br />
-      <label>
-        Tag:
-        <input
-          type='text'
-          value={tagValue}
-          onChange={(event) => {
-            setTagvalue(event.target.value);
-          }}
-        />
-        <button onClick={handleTagAdd}>add tag</button>
-        {tags.map((tag, index) => (
-          <div key={`tag-${index}`}>
-            <p>{tag}</p>
-            <button onClick={(event) => handleTagDelete(event, tag)}>x</button>
-          </div>
-        ))}
-      </label>
-      <br />
-      <button type='submit'>Submit</button>
-    </form>
+        </label>
+        <br />
+        <label>
+          Text:
+          <textarea
+            value={text}
+            onChange={(event) => {
+              setText(event.target.value);
+            }}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          State:
+          <select
+            value={state}
+            onChange={(event) => {
+              setState(event.target.value as State);
+            }}
+          >
+            <option value='default'>Default</option>
+            <option value='done'>Done</option>
+            <option value='expire'>Expire</option>
+            <option value='periodical'>Periodical</option>
+            <option value='pending'>Pending</option>
+          </select>
+        </label>
+        <br />
+        <label>
+          Expire Date:
+          <br />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              onChange={handleExpireDateChange}
+              disabled={state !== 'expire'}
+            />
+          </LocalizationProvider>
+        </label>
+        <br />
+        <label>
+          Tag:
+          <input
+            type='text'
+            value={tagValue}
+            onChange={(event) => {
+              setTagvalue(event.target.value);
+            }}
+          />
+          <button onClick={handleTagAdd}>add tag</button>
+          {tags.map((tag, index) => (
+            <div key={`tag-${index}`}>
+              <p>{tag}</p>
+              <button onClick={(event) => handleTagDelete(event, tag)}>
+                x
+              </button>
+            </div>
+          ))}
+        </label>
+        <br />
+        <button type='submit'>Submit</button>
+      </form>
+      <button onClick={() => setisAdding(false)}>close</button>
+    </>
   );
 }
 

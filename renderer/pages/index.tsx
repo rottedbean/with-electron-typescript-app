@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Autocomplete, TextField, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 import { Todo } from '../interfaces/Todo';
@@ -8,6 +8,7 @@ import TodoUpdateForm from '../components/TodoUpdate';
 import ViewDefault from '../components/ViewDefault';
 import ViewDetail from '../components/ViewDetail';
 import Layout from '../components/Layout';
+import TodoFilter from 'components/TodoFilter';
 
 import { useDataFetcher } from '../utils/dataFetcher';
 
@@ -20,7 +21,6 @@ export default function TodoPage() {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [sortedList, setSortedList] = useState(data);
   const [sortKey, setSortKey] = useState('none');
-  const [searchTerm, setSearchTerm] = useState('');
 
   //정렬리스트 초기값으로 원본 데이터 설정
   useEffect(() => {
@@ -67,31 +67,7 @@ export default function TodoPage() {
   return (
     <Layout title='Next.js + TypeScript + Electron Example'>
       <div>
-        <Autocomplete
-          freeSolo
-          disableClearable
-          options={data.map((todo: Todo) => todo.title)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label='Search input'
-              onChange={(event) => {
-                setSearchTerm(event.target.value);
-              }}
-              InputProps={{
-                ...params.InputProps,
-                type: 'search',
-              }}
-            />
-          )}
-        />
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={() => handleSearch(searchTerm)}
-        >
-          Search
-        </Button>
+        <TodoFilter todoData={data} handleSearch={handleSearch} />
         <div>
           <button onClick={() => handleSort('title')}>Sort by Title</button>
           <button onClick={() => handleSort('state')}>Sort by State</button>
@@ -115,14 +91,6 @@ export default function TodoPage() {
                     setSelectedTodo={setSelectedTodo}
                     handleRefresh={handleRefresh}
                   />{' '}
-                  <button
-                    onClick={() => {
-                      setisUpdating(false);
-                      setSelectedTodo(null);
-                    }}
-                  >
-                    close
-                  </button>
                 </>
               ) : selectedTodo != null && selectedTodo.id == todo.id ? (
                 //상세보기의 경우
@@ -147,12 +115,12 @@ export default function TodoPage() {
         {isAdding ? (
           <>
             <TodoForm setisAdding={setisAdding} handleRefresh={handleRefresh} />{' '}
-            <button onClick={() => setisAdding(false)}>close</button>
           </>
-        ) : null}
-        <Button onClick={() => setisAdding(true)} disabled={isAdding}>
-          <AddIcon />
-        </Button>
+        ) : (
+          <Button onClick={() => setisAdding(true)}>
+            <AddIcon />
+          </Button>
+        )}
         <p>now sorted by {sortKey}</p>
       </div>
     </Layout>
