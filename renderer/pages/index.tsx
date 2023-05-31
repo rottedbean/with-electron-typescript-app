@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-import { Todo } from '../interfaces/Todo';
-import TodoForm from '../components/TodoCreate';
-import TodoUpdateForm from '../components/TodoUpdate';
-import ViewDefault from '../components/ViewDefault';
-import ViewDetail from '../components/ViewDetail';
-import Layout from '../components/Layout';
+import Layout from 'components/Layout';
+import { Todo } from 'interfaces/Todo';
+import TodoForm from 'components/TodoCreate';
+import TodoUpdateForm from 'components/TodoUpdate';
+import ViewDefault from 'components/ViewDefault';
+import ViewDetail from 'components/ViewDetail';
 import TodoFilter from 'components/TodoFilter';
+import DeleteDialog from 'components/TodoDeleteDialog';
 
 import { useDataFetcher } from '../utils/dataFetcher';
 
@@ -19,6 +20,8 @@ export default function TodoPage() {
   const [isAdding, setisAdding] = useState(false);
   const [isUpdating, setisUpdating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [idToDelete, setIdToDelete] = useState('');
   const [sortedList, setSortedList] = useState(data);
   const [sortKey, setSortKey] = useState('none');
 
@@ -49,12 +52,9 @@ export default function TodoPage() {
     console.log(term);
   };
 
-  const handleDelete = async (id: string) => {
-    //dialog로 선택문 표시해야하는게?
-    global.ipcRenderer.invoke('formDelete', id);
-    global.ipcRenderer.on('deleteComplete', () => {
-      handleRefresh();
-    });
+  const handleDelete = (id: string) => {
+    setIdToDelete(id);
+    setOpenDialog(true);
   };
 
   const handleUpdate = (todo: Todo) => {
@@ -123,6 +123,14 @@ export default function TodoPage() {
         )}
         <p>now sorted by {sortKey}</p>
       </div>
+      {openDialog && (
+        <DeleteDialog
+          openDialog={openDialog}
+          idToDelete={idToDelete}
+          setOpenDialog={setOpenDialog}
+          handleRefresh={handleRefresh}
+        />
+      )}
     </Layout>
   );
 }
