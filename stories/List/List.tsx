@@ -1,8 +1,12 @@
 import React from 'react';
 
-import Icon from '../icons/Icon';
+import StateSlot from '../StateSlot/StateSlot';
+import MenuButton from '../MenuButton/MenuButton';
 import styled from '@emotion/styled';
-import { MiddleIcon, BigIcon } from '../icons/Icon.stories';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { MiddleDelayedStateSlot } from '../StateSlot/StateSlot.stories';
+import IconButton from '@mui/material/IconButton';
+import { Icon } from '@mui/material';
 
 export interface ListProps {
     text?: string;
@@ -11,19 +15,20 @@ export interface ListProps {
 
 function List({ text }: ListProps) {
     const DivStyle = styled.div`
-        width: 300px;
+        width: 350px;
         height: 40px;
         background-color: lightgray;
         border-radius: 8px;
         display: flex;
         align-items: center;
         padding: 0px 5px;
-        gap: 10px;
     `;
 
     const TextStyle = styled.p`
         font-size: 12pt;
         font-family: 'Pretendard-Medium';
+        width: 260px;
+        padding: 0px 10px;
         @font-face {
             font-family: 'Pretendard-Medium';
             src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
@@ -35,8 +40,9 @@ function List({ text }: ListProps) {
 
     return (
         <DivStyle>
-            <Icon {...MiddleIcon.args} />
+            <StateSlot {...MiddleDelayedStateSlot.args} />
             <TextStyle>{text}</TextStyle>
+            <MenuButton />
         </DivStyle>
     );
 }

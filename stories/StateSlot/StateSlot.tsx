@@ -16,11 +16,12 @@ export interface StateSlotProps {
 
 function StateSlot({ backgroundColor, size, state }: StateSlotProps) {
     function HomeIcon() {
-        if (state == 1) return;
+        if (state == 1) return null;
         else if (state == 2) return <ClearIcon />;
-        else if (state == 3) return <ForwardIcon />;
+        else return <ForwardIcon />;
+        return null;
     }
-
+    ('');
     const DivStyle = styled.div`
         background-color: ${backgroundColor};
         width: ${size}px;

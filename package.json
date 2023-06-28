@@ -1,63 +1,63 @@
 {
-  "private": true,
-  "main": "main/electron-src/index.js",
-  "name": "todolist",
-  "version": "1.0.0",
-  "scripts": {
-    "clean": "rimraf dist main renderer/out renderer/.next",
-    "dev": "npm run build-electron && electron .",
-    "build-renderer": "next build renderer && next export renderer",
-    "build-electron": "tsc -p electron-src",
-    "build": "npm run build-renderer && npm run build-electron",
-    "pack-app": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
-    "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
-  "dependencies": {
-    "@emotion/css": "^11.11.0",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.13.0",
-    "@mui/x-date-pickers": "^6.4.0",
-    "@types/electron": "^1.6.10",
-    "dayjs": "^1.11.7",
-    "electron-is-dev": "^1.1.0",
-    "electron-next": "^3.1.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "@storybook/addon-essentials": "^7.0.14",
-    "@storybook/addon-interactions": "^7.0.14",
-    "@storybook/addon-links": "^7.0.14",
-    "@storybook/blocks": "^7.0.14",
-    "@storybook/react": "^7.0.14",
-    "@storybook/react-vite": "^7.0.14",
-    "@storybook/testing-library": "^0.0.14-next.2",
-    "@types/node": "^14.14.6",
-    "@types/react": "^16.9.9",
-    "@types/react-datepicker": "^4.10.0",
-    "@types/react-dom": "^16.9.9",
-    "@types/uuid": "^9.0.1",
-    "electron": "^24.3.1",
-    "electron-builder": "^24.4.0",
-    "next": "latest",
-    "prettier": "^2.8.8",
-    "prop-types": "^15.8.1",
-    "rimraf": "^3.0.0",
-    "storybook": "^7.0.14",
-    "typescript": "^4.0.5",
-    "vite": "^4.3.8"
-  },
-  "build": {
-    "asar": true,
-    "files": [
-      "main",
-      "renderer/out"
-    ]
-  }
+    "private": true,
+    "main": "main/electron-src/index.js",
+    "name": "todolist",
+    "version": "1.0.0",
+    "scripts": {
+        "clean": "rimraf dist main renderer/out renderer/.next",
+        "dev": "npm run build-electron && electron .",
+        "build-renderer": "next build renderer && next export renderer",
+        "build-electron": "tsc -p electron-src",
+        "build": "npm run build-renderer && npm run build-electron",
+        "pack-app": "npm run build && electron-builder --dir",
+        "dist": "npm run build && elesudctron-builder",
+        "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
+    },
+    "dependencies": {
+        "@emotion/css": "^11.11.0",
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
+        "@mui/icons-material": "^5.11.16",
+        "@mui/material": "^5.13.0",
+        "@mui/x-date-pickers": "^6.4.0",
+        "@types/electron": "^1.6.10",
+        "dayjs": "^1.11.7",
+        "electron-is-dev": "^1.1.0",
+        "electron-next": "^3.1.5",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+        "@storybook/addon-essentials": "^7.0.14",
+        "@storybook/addon-interactions": "^7.0.14",
+        "@storybook/addon-links": "^7.0.14",
+        "@storybook/blocks": "^7.0.14",
+        "@storybook/react": "^7.0.14",
+        "@storybook/react-vite": "^7.0.14",
+        "@storybook/testing-library": "^0.0.14-next.2",
+        "@types/node": "^14.14.6",
+        "@types/react": "^16.9.9",
+        "@types/react-datepicker": "^4.10.0",
+        "@types/react-dom": "^16.9.9",
+        "@types/uuid": "^9.0.1",
+        "electron": "^24.3.1",
+        "electron-builder": "^24.4.0",
+        "next": "latest",
+        "prettier": "^2.8.8",
+        "prop-types": "^15.8.1",
+        "rimraf": "^3.0.0",
+        "storybook": "^7.0.14",
+        "typescript": "^4.0.5",
+        "vite": "^4.3.8"
+    },
+    "build": {
+        "asar": true,
+        "files": [
+            "main",
+            "renderer/out"
+        ]
+    }
 }
